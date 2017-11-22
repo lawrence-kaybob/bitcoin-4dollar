@@ -63,3 +63,6 @@ config.js
 # Messaging Test Application
 ngrok
 
+# Sublime Workspace
+*.sublime-project
+*.sublime-workspace
