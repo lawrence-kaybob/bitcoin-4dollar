@@ -4,10 +4,10 @@
 
 // var builder = require('botbuilder');
 // var bot = new builder.UniversalBot(connector);
-var messages = require('./../messages');
+var messages = require('./messages');
 
+module.exports  = function (bot, builder, mySqlConnection) {
 
-module.exports  = function (bot, builder) {
     bot.dialog('/greetings', [function (session) {
         var message = messages.greetings;
         session.send(message);
@@ -21,15 +21,20 @@ module.exports  = function (bot, builder) {
     }, function (session, results) {
         if(results.response) {
             var selection = results.response.entity;
+            // new builder.Message().address()
 
             switch(selection) {
-                case "시세확인":    // TODO : 상수화해야하지 않을까?
+                case '1':
+                case "시세확인":
                     // 시세확인 Dialog로 넘어갈 것
                     session.replaceDialog('/showRate');
                     break;
-               case "알림예약":
+                case '2':
+                case "알림예약":
                     // 알림예약 Dialog로 넘어갈 것
+                   session.replaceDialog('/createNotification');
                     break;
+                case '3':
                 case "알림테스트":
                     session.replaceDialog('/notificationTest');
                     break;
