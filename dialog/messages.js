@@ -17,5 +17,21 @@ module.exports = {
     resultMarketTemplate: "[%s] %s원",
 
     askDuplicateNotification: "자네는 이미 알림해달라고 한게 있군. <br/>그러나 내 능력이 부족해서 지금은 1인 1알림 밖에 안 된다네<br/>지금 알림은 삭제할텐가?",
-    choiceYN: ["네", "아니오"]
+    choiceYN: ["네", "아니오"],
+
+    returnToMainSelection: "그럼 처음으로 돌아가지",
+
+    notifyCaution: "알림은 아직 1인당 1개 밖에 안 된다네<br/>그것만 명심해두게",
+
+    askNotifyCurrency:"어떤 화폐의 알림을 받고 싶은가?",
+
+    askNotifyDeal: "어떤 시세를 알림받고 싶은가?",
+    choiceNotifyDeal: ["매수", "매도"],
+
+    askNotifyThreshold: "얼마쯤 됐을 떄 알려줄까?",
+
+    confirmNotifyRegistered: "알겠네. 때가 되면 알려주도록 하지"
+
+
+
 };

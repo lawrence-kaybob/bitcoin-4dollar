@@ -11,26 +11,22 @@ var mySqlConnection = mysql.createConnection({
 	user: 'class',
 	password: 'byunDB12!@',
 	timezone: 'local'
-})
+});
 
 var config = require('./config');
+var serverOption = {
+	url: 'b4d.lkaybob.pe.kr',
+	certificate: fs.readFileSync(config.certPath + 'fullchain.pem'),
+	key: fs.readFileSync(config.certPath + 'privkey.pem')
+};
+var server = restify.createServer(serverOption);
 
-// TODO : For live
-// var serverOption = {
-// 	url: 'b4d.lkaybob.pe.kr',
-// 	certificate: fs.readFileSync(config.certPath + 'fullchanin.pem'),
-// 	key: fs.readFileSync(config.certPath + 'privkey.pem')
-// };
-// var server = restify.createServer(serverOption);
-
-// TODO : For local
-var server = restify.createServer();
 mySqlConnection.connect(function (err) {
 	if(err)
 		console.log('[MySQL Package] Error Connecting MySQL Instance: ' + err.stack);
 	else {
 		console.log('Databse Server Connected');
-		mySqlConnection.query('use bc4dollar', function(err, results){
+		mySqlConnection.query('use bc4dollar', function(err){
             if(err)
                 console.log('[MySQL Package] Error Selecting Database:' + err.stack);
             else
@@ -43,19 +39,16 @@ server.listen(process.env.port || process.env.PORT || 3978, function () {
 	console.log("%s listening to %s", server.name, server.url);
 });
 
-// TODO : For Live
-// var connector = new builder.ChatConnector({
-// 	appId: process.env.MICROSOFT_APP_ID || config.appId,
-// 	appPassword: process.env.MICROSOFT_APP_PASSWORD || config.appPassword
-// });
-
-// TODO : For local
 var connector = new builder.ChatConnector({
-	appId: process.env.MICROSOFT_APP_ID,
-	appPassword: process.env.MICROSOFT_APP_PASSWORD
+	appId: process.env.MICROSOFT_APP_ID || config.appId,
+	appPassword: process.env.MICROSOFT_APP_PASSWORD || config.appPassword
 });
 
 server.post('/api/messages', connector.listen());
+server.post('/api/notifyListener', function (request, response) {
+	console.log(request);
+	response.send(202, "OK");
+});
 
 var bot = new builder.UniversalBot(connector, {
 	localizerSettings : {
@@ -65,6 +58,7 @@ var bot = new builder.UniversalBot(connector, {
 
 require('./dialog/main')(bot, builder, mySqlConnection);
 require('./dialog/showRate')(bot,builder, mySqlConnection);
+require('./dialog/createNotification')(bot, builder, mySqlConnection);
 require('./dialog/notificationTest')(bot, builder, redis);
 
 bot.dialog('/',  function (session) {

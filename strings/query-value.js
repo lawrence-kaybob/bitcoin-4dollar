@@ -17,5 +17,8 @@ module.exports = {
     bitcoin : 'BTC',
     ethereum: 'ETH',
     etherumClassic : 'ETC',
-    ripple : 'XRP'
-}
+    ripple : 'XRP',
+
+    notifyInsertQuery: 'insert into notifyMarket(currency, deal, threshold, id, lastNotifyTime) ' +
+    'values ("%s", "%s", "%s", "%s", "%s")'
+};
