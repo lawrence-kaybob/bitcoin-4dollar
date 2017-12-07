@@ -6,6 +6,7 @@ var util = require('util');
 
 module.exports = function (bot, builder, mySqlConnection) {
     bot.dialog('/checkDuplicateNotification', function (session) {
+
         if(session.userData.notification) {
             session.replaceDialog('/notifyDuplicate');
         } else {
@@ -65,11 +66,11 @@ module.exports = function (bot, builder, mySqlConnection) {
         console.log(results.response);
 
         session.userData.notification
-            = util.format(session.userData.notification, results.response, session.message.address.id, 'null');
+            = util.format(session.userData.notification, results.response, session.message.address.conversation.id, 'null');
 
         mySqlConnection.query(session.userData.notification, function (err) {
             if(err) {
-                console.log('[Session ID] ' + session.message.address + ' Error Occured:' + err.stack);
+                console.log('[Session ID] ' + session.message.address.conversation.id + ' Error Occured:' + err.stack);
             }
             else {
                 session.send(messages.confirmNotifyRegistered);
@@ -87,7 +88,13 @@ module.exports = function (bot, builder, mySqlConnection) {
         switch(results.response.entity) {
             case "네":
                 session.userData.notification = null;
-                session.replaceDialog('/setNotification');
+                var query = util.format(queryValue.deleteNotifySetting, session.message.address.conversation.id);
+                mySqlConnection.query(query, function(err){
+                    if(err)
+                        console.log('[Session ID] ' + session.message.address.conversation.id + ' Error Occured: ' + err.stack);
+                    else
+                        session.replaceDialog('/setNotification');
+                });
                 break;
             case "아니오":
                 session.send(messages.returnToMainSelection);
@@ -96,5 +103,3 @@ module.exports = function (bot, builder, mySqlConnection) {
         }
     }])
 };
-
-// TODO: Session.userData를 어떻게 저장할 수 있을까?

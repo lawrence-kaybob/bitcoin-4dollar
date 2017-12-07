@@ -6,7 +6,7 @@
 // var bot = new builder.UniversalBot(connector);
 var messages = require('./messages');
 
-module.exports  = function (bot, builder) {
+module.exports  = function (bot, builder, redisClient) {
 
     bot.dialog('/greetings', [function (session) {
         var message = messages.greetings;
@@ -15,8 +15,29 @@ module.exports  = function (bot, builder) {
     }]);
 
     bot.dialog('/mainSelection', [function (session) {
-        var choices = ['시세확인', '알림예약', '알림테스트'];
+        console.log(session.message.address.conversation.id);
+        redisClient.get(session.message.address.conversation.id, function (err, reply) {
+            if(err)
+                console.log('[Redis Package] Error connecting to database: ' + err);
+            else {
+                if(reply == null){
+                    redisClient.set(session.message.address.conversation.id, JSON.stringify(session.message.address), function (err, reply) {
+                        if(err)
+                            console.log('[Redis Package] Error connecting to database: ' + err);
+                        else
+                            console.log('[Redis Package] Client Added');
+                    });
+                    redisClient.sadd('broadcast', session.message.address.conversation.id, function (err, reply) {
+                        if(err)
+                            console.log('[Redis Package] Error connecting to database: ' + err);
+                    });
+                }
+            }
+        });
+
+        var choices = ['시세확인', '알림예약'/*, '알림테스트'*/];
         var message = messages.selection;
+
         builder.Prompts.choice(session, message, choices);
     }, function (session, results) {
         if(results.response) {

@@ -20,5 +20,7 @@ module.exports = {
     ripple : 'XRP',
 
     notifyInsertQuery: 'insert into notifyMarket(currency, deal, threshold, id, lastNotifyTime) ' +
-    'values ("%s", "%s", "%s", "%s", "%s")'
+    'values ("%s", "%s", "%s", "%s", "%s")',
+
+    deleteNotifySetting: 'delete from notifyMarket where id ="%s"'
 };

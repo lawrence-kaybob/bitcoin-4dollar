@@ -9,10 +9,10 @@ var queryValues = require('../strings/query-value');
 /**
  * showRate.js: 현재 시세 알려주기
  * */
-module.exports = function (bot, builder, mysqlConnection) {
+module.exports = function (bot, builder, mysqlConnection, formatter) {
 
     bot.dialog('/showRate', [function (session) {
-        var message = messages.askNotifyCurrency;
+        var message = messages.askShowRateCurrency;
         var choices = messages.choiceNotifyCurrency;
 
         builder.Prompts.choice(session, message, choices);
@@ -55,7 +55,7 @@ module.exports = function (bot, builder, mysqlConnection) {
     }, function (session, result) {
         var date = new Date();
         var currentDate = util.format("'%s-%s-%s %s:%s'",
-                date.getFullYear()+1900, date.getMonth()+1, date.getDate(), date.getHours(), date.getMinutes());
+                date.getUTCFullYear(), date.getMonth()+1, date.getDate(), date.getHours(), date.getMinutes() - 1);
         var attr;
 
         session.userData.rateQuery.deal = result.response.entity;
@@ -83,7 +83,7 @@ module.exports = function (bot, builder, mysqlConnection) {
                 console.log('[Session ID] ' + session.message.address + ' Error Occured:' + err.stack);
             }
             else {
-                console.log("[MySQL Callback] " + results[0]);
+                // console.log("[MySQL Callback] " + results[0]);
 
                 var resultDate = new Date(results[0].marketTime);
                 var currency = currencyCodeToLiteral(session.userData.rateQuery.currency);
@@ -96,15 +96,15 @@ module.exports = function (bot, builder, mysqlConnection) {
                     switch(session.userData.rateQuery.deal) {
                         case "매수":
                             message += util.format(messages.resultAskTemplate + "<br/>",
-                                pageCodeToLiteral(results[i].dealPage), results[i].lowAsk, results[i].highAsk);
+                                pageCodeToLiteral(results[i].dealPage), formatter.currency.format(results[i].lowAsk), formatter.currency.format(results[i].highAsk));
                             break;
                         case "매도":
                             message += util.format(messages.resultBidTemplate + "<br/>",
-                                pageCodeToLiteral(results[i].dealPage), results[i].highBid, results[i].lowBid);
+                                pageCodeToLiteral(results[i].dealPage), formatter.currency.format(results[i].lowBid), formatter.currency.format(results[i].lowBid));
                             break;
                         case "일반":
                             message += util.format(messages.resultMarketTemplate + "<br/>",
-                                pageCodeToLiteral(results[i].dealPage), results[i].marketPrice);
+                                pageCodeToLiteral(results[i].dealPage), formatter.currency.format(results[i].marketPrice));
                             break;
                     }
                 }
