@@ -66,3 +66,4 @@ ngrok
 # Sublime Workspace
 *.sublime-project
 *.sublime-workspace
+.idea/*
